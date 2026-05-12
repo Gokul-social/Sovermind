@@ -124,10 +124,10 @@ graph LR
     classDef model fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
     classDef output fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff
 
-    V[Voice Input]:::input -->|@qvac/transcription-whispercpp| W[Whisper.cpp]:::model
-    W -->|@qvac/llm-llamacpp| L[Llama.cpp]:::model
-    L -->|@qvac/translation-nmtcpp| T[NMT.cpp]:::model
-    T -->|Displayed to user| O[Translated Output]:::output
+    V[Voice Input]:::input -->|"@qvac/transcription-whispercpp"| W[Whisper.cpp]:::model
+    W -->|"@qvac/llm-llamacpp"| L[Llama.cpp]:::model
+    L -->|"@qvac/translation-nmtcpp"| T[NMT.cpp]:::model
+    T -->|"Displayed to user"| O[Translated Output]:::output
 ```
 
 ### 📄 Prescription OCR & Vault
@@ -137,9 +137,9 @@ graph LR
     classDef model fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
     classDef output fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
 
-    I[Image Upload]:::input -->|@qvac/ocr-onnx| O[ONNX OCR]:::model
-    O -->|@qvac/llm-llamacpp| L[Llama.cpp Entities]:::model
-    L -->|AES-256 Encrypted| V[Local Vault]:::output
+    I[Image Upload]:::input -->|"@qvac/ocr-onnx"| O[ONNX OCR]:::model
+    O -->|"@qvac/llm-llamacpp"| L[Llama.cpp Entities]:::model
+    L -->|"AES-256 Encrypted"| V[Local Vault]:::output
 ```
 
 ---
