@@ -1,0 +1,15 @@
+{
+  "name": "sovermind",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev:server & npm run dev:app",
+    "dev:app": "npm run dev --workspace @sovermind/app",
+    "dev:server": "npm run dev --workspace @sovermind/server",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  }
+}
