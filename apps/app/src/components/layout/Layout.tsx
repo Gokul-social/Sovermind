@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import Sidebar from './Sidebar'
 import Header from './Header'
+import { DemoBanner } from '../shared/DemoBanner'
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <main className="ml-64 mt-16 h-[calc(100vh-64px)] overflow-hidden">
         {children}
       </main>
+      <DemoBanner />
     </div>
   )
 }

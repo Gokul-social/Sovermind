@@ -52,6 +52,10 @@ export const config = {
   // Security
   ALLOWED_ORIGIN: optional('ALLOWED_ORIGIN', 'http://localhost:5173'),
 
+  // LLM prompt template — must match the downloaded model family
+  // 'mistral' | 'llama3' | 'phi3'
+  MODEL_TEMPLATE: optional('MODEL_TEMPLATE', 'mistral') as 'mistral' | 'llama3' | 'phi3',
+
   // Resolved model paths (only if set)
   resolvedLLMPath():         string | null { return this.LLM_MODEL_PATH         ? resolvePath(this.LLM_MODEL_PATH)         : null },
   resolvedWhisperPath():     string | null { return this.WHISPER_MODEL_PATH     ? resolvePath(this.WHISPER_MODEL_PATH)     : null },

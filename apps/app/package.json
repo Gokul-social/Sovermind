@@ -6,15 +6,22 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:demo": "VITE_DEMO_MODE=true tsc -b && VITE_DEMO_MODE=true vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b --pretty false",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:vercel": "npm run build:demo && vercel --prod"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/web3.js": "^1.95.3",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.15.0",
     "zustand": "^5.0.13"
+  },
+  "optionalDependencies": {
+    "@tether.io/wdk": "*"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

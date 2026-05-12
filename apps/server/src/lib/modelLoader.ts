@@ -7,6 +7,7 @@ import type {
   QVACWhisperModel,
   QVACOCRModel,
   QVACTranslationModel,
+  LLMCompletionOptions,
 } from '../types/index.js'
 
 // ── In-memory model cache ──────────────────────────────────────────
@@ -35,21 +36,45 @@ async function loadLLM(log: (msg: string) => void): Promise<void> {
   }
   const t0 = Date.now()
   try {
-    // TODO: replace with real SDK import once @qvac/llm-llamacpp is installed
-    // const { LlamaCpp } = await import('@qvac/llm-llamacpp')
-    // cache.llm = new LlamaCpp({ modelPath, contextSize: config.CONTEXT_WINDOW })
-    // await cache.llm.load()
+    const { LlamaCpp } = await import('@qvac/llm-llamacpp')
+    const llamaCpp = new LlamaCpp()
+    await llamaCpp.load({
+      modelPath,
+      contextSize: config.CONTEXT_WINDOW,
+      gpuLayers: 'auto',
+      threads: 4,
+    })
 
-    // ── Stub: remove when SDK is available ──
     cache.llm = {
-      async complete(prompt, opts = {}) {
-        void prompt
-        await new Promise<void>(r => setTimeout(r, 800))
-        const text = `[STUB] Local LLM response for: "${prompt.slice(0, 40)}..."`
-        return { text, tokensUsed: text.split(' ').length }
+      async complete(prompt: string, opts: LLMCompletionOptions = {}) {
+        const { maxTokens, temperature, onToken, signal } = opts
+
+        if (onToken) {
+          // Use streaming interface to drive the onToken callback
+          let text = ''
+          let tokensUsed = 0
+          for await (const chunk of llamaCpp.stream({
+            prompt,
+            maxTokens,
+            temperature,
+            signal,
+          })) {
+            onToken(chunk.token)
+            text += chunk.token
+            tokensUsed++
+          }
+          return { text, tokensUsed }
+        }
+
+        const result = await llamaCpp.generate({
+          prompt,
+          maxTokens,
+          temperature,
+          stopSequences: ['</s>', '[INST]', '[/INST]'],
+        })
+        return { text: result.text, tokensUsed: result.tokensGenerated }
       },
     }
-    // ── End stub ──
 
     recordModelLoaded('llm')
     log(`✓  LLM loaded in ${Date.now() - t0}ms`)
@@ -66,23 +91,27 @@ async function loadWhisper(log: (msg: string) => void): Promise<void> {
   }
   const t0 = Date.now()
   try {
-    // TODO: replace with real SDK import once @qvac/transcription-whispercpp is installed
-    // const { WhisperCpp } = await import('@qvac/transcription-whispercpp')
-    // cache.whisper = new WhisperCpp({ modelPath })
-    // await cache.whisper.load()
+    const { WhisperCpp } = await import('@qvac/transcription-whispercpp')
+    const whisperCpp = new WhisperCpp()
+    await whisperCpp.load({
+      modelPath,
+      language: 'auto',
+    })
 
-    // ── Stub ──
     cache.whisper = {
-      async transcribe(_audioPath, _opts) {
-        await new Promise<void>(r => setTimeout(r, 1200))
+      async transcribe(audioPath: string, opts?: { language?: string }) {
+        const result = await whisperCpp.transcribe({
+          audioPath,
+          language: opts?.language ?? 'auto',
+          diarize: false,
+        })
         return {
-          text:       'What are the side effects of Metformin?',
-          language:   'en',
-          durationMs: 3400,
+          text:       result.text.trim(),
+          language:   result.language,
+          durationMs: result.audioDurationMs,
         }
       },
     }
-    // ── End stub ──
 
     recordModelLoaded('whisper')
     log(`✓  Whisper loaded in ${Date.now() - t0}ms`)
@@ -99,22 +128,25 @@ async function loadOCR(log: (msg: string) => void): Promise<void> {
   }
   const t0 = Date.now()
   try {
-    // TODO: replace with real SDK import once @qvac/ocr-onnx is installed
-    // const { OnnxOCR } = await import('@qvac/ocr-onnx')
-    // cache.ocr = new OnnxOCR({ modelPath })
-    // await cache.ocr.load()
+    const { OcrOnnx } = await import('@qvac/ocr-onnx')
+    const ocrOnnx = new OcrOnnx()
+    await ocrOnnx.load({
+      modelPath,
+    })
 
-    // ── Stub ──
     cache.ocr = {
-      async scan(_imagePath) {
-        await new Promise<void>(r => setTimeout(r, 1500))
+      async scan(imagePath: string) {
+        const result = await ocrOnnx.recognize({
+          imagePath,
+          language: 'eng',
+          detectOrientation: true,
+        })
         return {
-          text: 'LISINOPRIL 10MG\nMetformin HCL 500MG\nTake twice daily with food\nATORVASTATIN 20MG\nRefill: 2 times',
-          confidence: 94.2,
+          text:       result.text,
+          confidence: result.confidence,
         }
       },
     }
-    // ── End stub ──
 
     recordModelLoaded('ocr')
     log(`✓  OCR loaded in ${Date.now() - t0}ms`)
@@ -131,19 +163,23 @@ async function loadTranslation(log: (msg: string) => void): Promise<void> {
   }
   const t0 = Date.now()
   try {
-    // TODO: replace with real SDK import once @qvac/translation-nmtcpp is installed
-    // const { NmtCpp } = await import('@qvac/translation-nmtcpp')
-    // cache.translation = new NmtCpp({ modelDir: modelPath })
-    // await cache.translation.load()
+    const { NmtCpp } = await import('@qvac/translation-nmtcpp')
+    const nmtCpp = new NmtCpp()
+    await nmtCpp.load({
+      modelPath,
+    })
 
-    // ── Stub ──
+    // Adapter: translate.service passes ISO-639-1 codes ('ta', 'en', etc.)
     cache.translation = {
-      async translate(text, targetLanguage, _sourceLanguage) {
-        await new Promise<void>(r => setTimeout(r, 600))
-        return { translatedText: `[${targetLanguage.toUpperCase()}] ${text}` }
+      async translate(text: string, targetLanguage: string, sourceLanguage?: string) {
+        const result = await nmtCpp.translate({
+          text,
+          sourceLang: sourceLanguage ?? 'en',
+          targetLang: targetLanguage,
+        })
+        return { translatedText: result.translatedText }
       },
     }
-    // ── End stub ──
 
     recordModelLoaded('translation')
     log(`✓  Translation loaded in ${Date.now() - t0}ms`)

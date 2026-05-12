@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
+import { useSessionLogger } from '../hooks/useSessionLogger'
+import { unlockPremiumReport } from '../lib/solana'
 import type { VaultEntry, VaultType } from '../types'
 
 type Filter = 'all' | VaultType
@@ -29,9 +31,18 @@ function formatDate(iso: string) {
   }
 }
 
-function VaultCard({ entry, onDelete }: { entry: VaultEntry; onDelete: () => void }) {
-  const [expanded,  setExpanded]  = useState(false)
-  const [confirming, setConfirming] = useState(false)
+function VaultCard({
+  entry,
+  onDelete,
+  onPremiumReport,
+}: {
+  entry: VaultEntry
+  onDelete: () => void
+  onPremiumReport: () => Promise<void>
+}) {
+  const [expanded,    setExpanded]    = useState(false)
+  const [confirming,  setConfirming]  = useState(false)
+  const [isUnlocking, setIsUnlocking] = useState(false)
 
   return (
     <article className="border border-outline-variant bg-surface-container-low animate-fade-in">
@@ -57,6 +68,20 @@ function VaultCard({ entry, onDelete }: { entry: VaultEntry; onDelete: () => voi
             <span className="material-symbols-outlined text-[18px]">
               {expanded ? 'unfold_less' : 'unfold_more'}
             </span>
+          </button>
+          <button
+            onClick={async () => {
+              setIsUnlocking(true)
+              try { await onPremiumReport() } finally { setIsUnlocking(false) }
+            }}
+            disabled={isUnlocking}
+            className="flex items-center gap-1 px-2 py-0.5 border border-tertiary-fixed-dim text-tertiary-fixed-dim font-mono text-[10px] uppercase tracking-[0.05em] hover:bg-tertiary-fixed-dim hover:text-on-surface transition-all disabled:opacity-40 disabled:cursor-wait"
+            title="Pay 0.50 USDT on Solana to unlock a premium PDF report"
+          >
+            <span className="material-symbols-outlined text-[14px]">
+              {isUnlocking ? 'hourglass_top' : 'workspace_premium'}
+            </span>
+            {isUnlocking ? 'Paying…' : 'Premium'}
           </button>
           {confirming ? (
             <div className="flex items-center gap-1 ml-1">
@@ -102,8 +127,23 @@ function VaultCard({ entry, onDelete }: { entry: VaultEntry; onDelete: () => voi
 
 export default function Vault() {
   const { vaultEntries, deleteVaultEntry } = useAppStore()
+  const logger = useSessionLogger()
   const [filter, setFilter] = useState<Filter>('all')
   const [view,   setView]   = useState<'list' | 'grid'>('list')
+
+  async function handlePremiumReport(entry: VaultEntry): Promise<void> {
+    try {
+      logger.info('Initiating Solana payment for premium report…')
+      const { signature, explorerUrl } = await unlockPremiumReport(
+        entry.id,
+        typeof entry.data === 'string' ? entry.data : JSON.stringify(entry.data),
+      )
+      logger.success(`Payment confirmed: ${signature.slice(0, 8)}…`)
+      logger.info(`Explorer: ${explorerUrl}`)
+    } catch (err) {
+      logger.error(`Payment failed: ${err instanceof Error ? err.message : String(err)}`)
+    }
+  }
 
   const filtered = filter === 'all'
     ? vaultEntries
@@ -176,6 +216,7 @@ export default function Vault() {
                 key={entry.id}
                 entry={entry}
                 onDelete={() => deleteVaultEntry(entry.id)}
+                onPremiumReport={() => handlePremiumReport(entry)}
               />
             ))}
           </div>

@@ -39,5 +39,17 @@ lerna-debug.log*
 *.sln
 *.sw?
 
+# Model files (too large for git — download separately per README)
+apps/server/models/*.gguf
+apps/server/models/*.bin
+apps/server/models/*.onnx
+
+# Vault data (user health data — never commit)
+.sovermind/
+
+# Anchor / Solana build artifacts
+contract/target/
+contract/.anchor/
+
 # Scaffold noise that should not ship with the repo
 apps/app/README.md

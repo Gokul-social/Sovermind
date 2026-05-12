@@ -12,11 +12,12 @@ export type SystemStatusValue = 'optimal' | 'degraded' | 'critical'
 // Replace the implementations in modelLoader.ts when the SDK is available.
 
 export interface LLMCompletionOptions {
-  maxTokens?:   number
-  temperature?: number
-  systemPrompt?: string
-  onToken?:     (token: string) => void
-  signal?:      AbortSignal
+  maxTokens?:      number
+  temperature?:    number
+  systemPrompt?:   string
+  stopSequences?:  string[]
+  onToken?:        (token: string) => void
+  signal?:         AbortSignal
 }
 
 export interface LLMCompletionResult {
