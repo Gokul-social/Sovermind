@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useAppStore } from '../../store/useAppStore'
+import { useSessionLogger } from '../../hooks/useSessionLogger'
 import PulseIndicator from '../shared/PulseIndicator'
 import type { Language } from '../../types'
 import { LANGUAGE_LABELS } from '../../types'
@@ -9,6 +10,7 @@ const LANGUAGES = Object.entries(LANGUAGE_LABELS) as [Language, { label: string;
 
 export default function Header() {
   const { selectedLanguage, setLanguage, systemStatus, setSystemStatus, bytesSentToCloud } = useAppStore()
+  const logger = useSessionLogger()
 
   useEffect(() => {
     async function poll() {
@@ -75,6 +77,15 @@ export default function Header() {
           {(['wifi_off', 'enhanced_encryption', 'settings'] as const).map((icon) => (
             <button
               key={icon}
+              onClick={() => {
+                if (icon === 'wifi_off') logger.info('Network adapter disabled. Local offline mode active.')
+                else if (icon === 'enhanced_encryption') logger.success('AES-256 local vault encryption is active.')
+                else if (icon === 'settings') logger.warn('Settings panel locked during demo mode.')
+              }}
+              title={
+                icon === 'wifi_off' ? 'Offline Mode Status' :
+                icon === 'enhanced_encryption' ? 'Encryption Status' : 'Settings'
+              }
               className="p-1.5 text-on-surface-variant hover:text-primary transition-colors duration-150"
             >
               <span className="material-symbols-outlined text-[20px]">{icon}</span>
