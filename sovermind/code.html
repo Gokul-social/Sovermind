@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SoverMind — Local AI Health Companion</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "error": "#ffb4ab",
+          "on-tertiary-fixed": "#291800",
+          "on-primary": "#00382e",
+          "on-secondary-container": "#a3bfac",
+          "on-surface": "#dfe4de",
+          "surface-tint": "#00dfbe",
+          "surface-container-highest": "#313632",
+          "surface-container-low": "#181d19",
+          "surface-container-high": "#262b28",
+          "primary-container": "#00e5c3",
+          "on-error-container": "#ffdad6",
+          "on-tertiary": "#452b00",
+          "tertiary": "#ffe3c2",
+          "inverse-primary": "#006b5a",
+          "on-primary-container": "#006152",
+          "tertiary-fixed-dim": "#ffb94f",
+          "secondary-fixed-dim": "#b1cdba",
+          "on-secondary-fixed": "#062014",
+          "on-primary-fixed-variant": "#005143",
+          "inverse-surface": "#dfe4de",
+          "on-background": "#dfe4de",
+          "on-surface-variant": "#b9cac4",
+          "secondary": "#b1cdba",
+          "primary": "#70ffe0",
+          "surface-variant": "#313632",
+          "on-primary-fixed": "#00201a",
+          "tertiary-container": "#ffc064",
+          "on-tertiary-fixed-variant": "#624000",
+          "surface-dim": "#0f1511",
+          "outline-variant": "#3b4a45",
+          "secondary-fixed": "#ccead5",
+          "on-tertiary-container": "#764d00",
+          "inverse-on-surface": "#2c322e",
+          "on-secondary-fixed-variant": "#334c3d",
+          "error-container": "#93000a",
+          "on-secondary": "#1d3528",
+          "surface-bright": "#353a37",
+          "on-error": "#690005",
+          "background": "#0f1511",
+          "secondary-container": "#354f40",
+          "tertiary-fixed": "#ffddb3",
+          "surface": "#0f1511",
+          "primary-fixed-dim": "#00dfbe",
+          "surface-container": "#1c211d",
+          "surface-container-lowest": "#0a0f0c",
+          "primary-fixed": "#42fdda",
+          "outline": "#84948f"
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem",
+          lg: "0.5rem",
+          xl: "0.75rem",
+          full: "9999px"
+        },
+        spacing: {
+          "stack-lg": "32px",
+          "gutter": "12px",
+          "container-padding": "20px",
+          "stack-md": "16px",
+          "unit": "4px",
+          "stack-sm": "8px"
+        },
+        fontFamily: {
+          "headline-lg": ["Syne", "sans-serif"],
+          "body-md": ["Source Serif 4", "serif"],
+          "body-lg": ["Source Serif 4", "serif"],
+          "label-md": ["IBM Plex Mono", "monospace"],
+          "headline-md": ["Syne", "sans-serif"],
+          "label-sm": ["IBM Plex Mono", "monospace"]
+        },
+        fontSize: {
+          "headline-lg": ["32px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
+          "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+          "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+          "label-md": ["14px", { lineHeight: "1.4", fontWeight: "500" }],
+          "headline-md": ["24px", { lineHeight: "1.2", fontWeight: "700" }],
+          "label-sm": ["12px", { lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "400" }]
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .icon-fill {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .bg-tech-grid {
+    background-image:
+      linear-gradient(rgba(59,74,69,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,74,69,0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .glow-sm  { box-shadow: inset 0 0 10px rgba(112,255,224,0.2); }
+  .glow-outer { box-shadow: 0 0 20px rgba(112,255,224,0.5); }
+
+  /* Scanline overlay */
+  .scanline::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(112,255,224,0.03) 0px,
+      rgba(112,255,224,0.03) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events: none;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #0a0f0c; border-left: 1px solid #3b4a45; }
+  ::-webkit-scrollbar-thumb { background: #3b4a45; }
+  ::-webkit-scrollbar-thumb:hover { background: #70ffe0; }
+
+  /* Animated scan line for Scan screen */
+  @keyframes scanDown {
+    0%   { top: 0%; }
+    100% { top: 100%; }
+  }
+  .scan-line-anim {
+    animation: scanDown 3s linear infinite;
+  }
+
+  /* ── Monitor: outer ring pulse ── */
+  @keyframes ringPulse {
+    0%, 100% { transform: scale(1);    opacity: 0.6; }
+    50%       { transform: scale(1.05); opacity: 0.85; }
+  }
+  .ring-pulse {
+    animation: ringPulse 2s ease-in-out infinite;
+  }
+
+  /* ── Monitor: graphic_eq waveform ── */
+  @keyframes eqBars {
+    0%   { transform: scaleY(0.7);  }
+    33%  { transform: scaleY(1.15); }
+    66%  { transform: scaleY(0.9);  }
+    100% { transform: scaleY(0.7);  }
+  }
+  .eq-anim {
+    animation: eqBars 1.2s ease-in-out infinite;
+    transform-origin: center bottom;
+    display: inline-block;
+  }
+
+  /* ── Scan: card staggered reveal ── */
+  .scan-card { opacity: 0; }
+  @keyframes cardReveal {
+    from { opacity: 0;    transform: translateY(12px); }
+    to   { opacity: 1;    transform: translateY(0);    }
+  }
+  @keyframes cardRevealDim {
+    from { opacity: 0;    transform: translateY(12px); }
+    to   { opacity: 0.75; transform: translateY(0);    }
+  }
+  .card-reveal     { animation: cardReveal    0.5s ease forwards; }
+  .card-reveal-dim { animation: cardRevealDim 0.5s ease forwards; }
+
+  /* ── Monitor: faster eq animation during recording ── */
+  .eq-anim-fast {
+    animation: eqBars 0.35s ease-in-out infinite;
+    transform-origin: center bottom;
+    display: inline-block;
+  }
+
+  /* ── Monitor: recording state — amber ring ── */
+  .ring-recording {
+    border-color: #ffb94f !important;
+    box-shadow: 0 0 20px rgba(255,185,79,0.6) !important;
+    animation: ringPulse 0.8s ease-in-out infinite !important;
+  }
+
+  /* ── Monitor: core circle transitions ── */
+  #voice-core {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  #voice-core:hover {
+    box-shadow: inset 0 0 40px rgba(112,255,224,0.7), 0 0 15px rgba(112,255,224,0.3);
+  }
+  #voice-core.recording-active {
+    border-color: #ffb94f;
+    box-shadow: inset 0 0 30px rgba(255,185,79,0.5);
+  }
+
+  /* ── Monitor: transcript display ── */
+  #transcript-area {
+    max-width: 320px;
+    width: 100%;
+  }
+
+  /* ── Analysis: cursor blink ── */
+  @keyframes cursorBlink {
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 1; }
+  }
+  .cursor-blink { animation: cursorBlink 1s ease-in-out infinite; }
+
+  /* ── Analysis: system optimal dot glow ── */
+  .dot-glow { filter: drop-shadow(0 0 5px #70ffe0); }
+
+  /* Nav active state */
+  .nav-active {
+    background-color: #354f40;
+    color: #70ffe0;
+    border-right: 2px solid #70ffe0;
+    box-shadow: inset 0 0 10px rgba(112,255,224,0.2);
+    font-weight: 700;
+  }
+  .nav-inactive {
+    color: #b9cac4;
+    border-right: 2px solid transparent;
+  }
+  .nav-inactive:hover {
+    color: #70ffe0;
+    background-color: #313632;
+  }
+</style>
+</head>
+
+<body class="bg-background text-on-surface h-screen overflow-hidden flex selection:bg-primary selection:text-on-primary">
+
+<!-- Global grid texture -->
+<div class="fixed inset-0 pointer-events-none z-0 bg-tech-grid"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SIDEBAR                                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<nav class="fixed left-0 top-0 h-full w-64 flex flex-col z-40 bg-surface-container-low border-r border-outline-variant">
+
+  <!-- Brand -->
+  <div class="p-container-padding border-b border-outline-variant mb-stack-md flex flex-col items-center">
+    <div class="w-16 h-16 rounded-full border border-primary flex items-center justify-center bg-surface-container-lowest mb-stack-sm shadow-[inset_0_0_10px_rgba(112,255,224,0.4)]">
+      <span class="material-symbols-outlined text-primary text-[32px] icon-fill">memory</span>
+    </div>
+    <h1 class="font-headline-md text-headline-md font-extrabold tracking-tighter text-primary">SOVERMIND</h1>
+    <span class="font-label-sm text-label-sm text-on-surface-variant mt-unit">Local System Active</span>
+  </div>
+
+  <!-- Nav tabs -->
+  <div class="flex flex-col flex-grow w-full px-stack-sm gap-unit">
+    <button id="nav-monitor"
+      onclick="switchScreen('monitor')"
+      class="nav-active flex items-center gap-stack-md p-stack-md w-full text-left font-label-md text-label-md transition-all duration-150">
+      <span class="material-symbols-outlined icon-fill">mic</span>
+      Monitor
+    </button>
+    <button id="nav-scan"
+      onclick="switchScreen('scan')"
+      class="nav-inactive flex items-center gap-stack-md p-stack-md w-full text-left font-label-md text-label-md transition-all duration-150">
+      <span class="material-symbols-outlined">document_scanner</span>
+      Scan
+    </button>
+    <button id="nav-vault"
+      onclick="switchScreen('vault')"
+      class="nav-inactive flex items-center gap-stack-md p-stack-md w-full text-left font-label-md text-label-md transition-all duration-150">
+      <span class="material-symbols-outlined">lock</span>
+      Vault
+    </button>
+  </div>
+
+  <!-- Emergency Purge -->
+  <div class="p-container-padding border-t border-outline-variant mt-auto">
+    <button class="w-full flex items-center justify-center gap-unit p-stack-sm border border-error text-error font-label-md text-label-md uppercase tracking-widest hover:bg-error hover:text-on-error transition-colors">
+      <span class="material-symbols-outlined text-[18px]">warning</span>
+      Emergency Purge
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TOP APP BAR                                                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<header class="fixed top-0 right-0 left-64 flex justify-between items-center px-container-padding z-50 h-16 border-b border-outline-variant bg-surface-container-lowest">
+  <div class="font-headline-lg text-headline-lg font-black tracking-widest text-primary">SOVERMIND</div>
+  <div class="flex items-center gap-stack-md">
+    <button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200 p-unit">
+      <span class="material-symbols-outlined">wifi_off</span>
+    </button>
+    <button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200 p-unit">
+      <span class="material-symbols-outlined">enhanced_encryption</span>
+    </button>
+    <button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200 p-unit">
+      <span class="material-symbols-outlined">settings</span>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 1: MONITOR                                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<main id="screen-monitor" class="ml-64 mt-16 p-container-padding w-full h-[calc(100vh-64px)] overflow-y-auto relative z-10 flex flex-col gap-stack-lg">
+
+  <!-- Status header -->
+  <div class="flex justify-between items-end border-b border-outline-variant pb-stack-sm">
+    <div class="flex flex-col gap-unit">
+      <h2 class="font-headline-md text-headline-md text-on-surface">Core Diagnostics</h2>
+      <div class="flex items-center gap-unit font-label-sm text-label-sm text-primary">
+        <span class="w-2 h-2 bg-primary shadow-[0_0_8px_rgba(112,255,224,0.8)] rounded-full"></span>
+        MONITOR_ACTIVE_T01
+      </div>
+    </div>
+    <div class="border border-primary bg-surface-container-low px-stack-sm py-unit flex items-center gap-gutter font-label-md text-label-md text-primary shadow-[inset_0_0_5px_rgba(112,255,224,0.3)]">
+      <span class="material-symbols-outlined text-[18px]">verified_user</span>
+      Offline · Private
+    </div>
+  </div>
+
+  <!-- Bento grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-stack-md flex-grow">
+
+    <!-- Left: Terminal log -->
+    <div class="col-span-1 lg:col-span-3 border border-outline-variant bg-surface-container-lowest flex flex-col">
+      <div class="border-b border-outline-variant p-stack-sm font-label-sm text-label-sm text-on-surface-variant flex justify-between items-center bg-surface-container-low uppercase tracking-widest">
+        <span>Sys_Log</span>
+        <span class="material-symbols-outlined text-[14px]">terminal</span>
+      </div>
+      <div id="terminal-log" class="p-stack-sm font-label-sm text-label-sm text-primary flex flex-col gap-[2px] overflow-hidden leading-tight flex-grow">
+        <div class="flex gap-unit opacity-50"><span class="w-16 shrink-0">08:42:01</span><span>[INIT] Core neural sequence started.</span></div>
+        <div class="flex gap-unit opacity-50"><span class="w-16 shrink-0">08:42:05</span><span>[MEM] Allocating 16GB VRAM.</span></div>
+        <div class="flex gap-unit opacity-50"><span class="w-16 shrink-0">08:42:06</span><span>[SEC] Local isolation verified.</span></div>
+        <div class="flex gap-unit opacity-50"><span class="w-16 shrink-0">08:42:10</span><span>[AUDIO] Device recognized.</span></div>
+        <div class="flex gap-unit opacity-75"><span class="w-16 shrink-0">08:42:15</span><span>[AI] Model weights loaded perfectly.</span></div>
+        <div class="flex gap-unit text-on-surface font-bold mt-unit"><span class="w-16 shrink-0 text-primary">08:43:00</span><span>[SYS] Awaiting vocal input...</span></div>
+        <div id="terminal-cursor" class="flex gap-unit mt-auto border-t border-outline-variant pt-unit">
+          <span class="animate-pulse w-2 h-4 bg-primary inline-block"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Pulsing waveform / biometric core -->
+    <div class="col-span-1 lg:col-span-6 border border-outline-variant bg-surface-container flex flex-col relative overflow-hidden h-[500px] lg:h-auto">
+      <!-- Corner accents -->
+      <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primary m-unit z-10"></div>
+      <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-primary m-unit z-10"></div>
+      <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-primary m-unit z-10"></div>
+      <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary m-unit z-10"></div>
+
+      <div class="flex flex-col items-center justify-center h-full w-full relative z-10">
+        <!-- Concentric rings -->
+        <div class="absolute w-[350px] h-[350px] border border-outline-variant rounded-full opacity-30"></div>
+        <div class="absolute w-[280px] h-[280px] border border-dashed border-outline-variant rounded-full opacity-50"></div>
+        <!-- Outer glowing ring -->
+        <div id="outer-ring" class="absolute w-[200px] h-[200px] border-2 border-primary rounded-full glow-outer ring-pulse"></div>
+        <!-- Inner core — click to toggle recording -->
+        <div id="voice-core" onclick="toggleRecording()" class="w-32 h-32 bg-surface-container-lowest border-4 border-primary rounded-full flex items-center justify-center shadow-[inset_0_0_30px_rgba(112,255,224,0.5)] relative z-20" title="Click to record">
+          <span id="eq-icon" class="material-symbols-outlined text-[64px] text-primary icon-fill eq-anim">graphic_eq</span>
+        </div>
+        <!-- Data readouts -->
+        <div class="absolute right-stack-lg top-1/2 -translate-y-1/2 font-label-sm text-label-sm text-primary flex flex-col gap-unit text-right">
+          <span>FREQ: 44.1 kHz</span>
+          <span>AMP: +12 dB</span>
+          <span>NOISE_GATE: ON</span>
+        </div>
+        <!-- Status label -->
+        <div id="status-label" class="mt-stack-lg font-headline-md text-headline-md text-primary tracking-[0.2em] uppercase glow-sm px-stack-md py-unit border border-primary bg-surface-container-lowest transition-colors duration-300">
+          Listening
+        </div>
+
+        <!-- Live transcript display (hidden until recording) -->
+        <div id="transcript-area" class="hidden mt-stack-sm">
+          <div class="border border-outline-variant bg-surface-container-lowest px-stack-sm py-unit font-label-md text-label-md text-on-surface leading-relaxed min-h-[48px] max-h-[72px] overflow-y-auto" style="word-break:break-word;">
+            <span id="transcript-display" class="opacity-80"></span>
+            <span class="animate-pulse inline-block w-[2px] h-[1em] bg-tertiary-fixed-dim ml-[2px] align-middle"></span>
+          </div>
+        </div>
+
+        <!-- Process query button (hidden until transcript captured) -->
+        <button id="process-btn" onclick="processQuery()" class="hidden mt-stack-sm font-label-md text-label-md bg-primary text-on-primary px-stack-md py-unit uppercase tracking-widest hover:brightness-110 transition-all shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] flex items-center gap-unit">
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          Process Query
+        </button>
+
+        <!-- Fallback text input (shown when SpeechRecognition unsupported) -->
+        <div id="voice-fallback" class="hidden mt-stack-sm w-full max-w-xs">
+          <div class="border border-error/50 bg-surface-container-lowest px-stack-sm py-unit flex items-center gap-unit mb-unit">
+            <span class="material-symbols-outlined text-[14px] text-error">mic_off</span>
+            <span class="font-label-sm text-label-sm text-error">Voice unavailable in this browser</span>
+          </div>
+          <div class="relative flex items-center border-b border-outline-variant focus-within:border-primary transition-colors">
+            <input id="fallback-input" type="text"
+              class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-label-md text-label-md py-unit px-0 outline-none"
+              placeholder="Type your symptoms here..."
+              oninput="onFallbackInput(this.value)" />
+          </div>
+          <button id="fallback-process-btn" onclick="processQuery()" class="hidden mt-stack-sm w-full font-label-md text-label-md bg-primary text-on-primary py-unit uppercase tracking-widest hover:brightness-110 transition-all">
+            Process Query →
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right: Stats -->
+    <div class="col-span-1 lg:col-span-3 flex flex-col gap-stack-md h-full">
+
+      <!-- Vault Integrity -->
+      <div class="border border-outline-variant bg-surface-container-low p-stack-md flex-grow basis-1/2 flex flex-col justify-between">
+        <div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest flex items-center justify-between border-b border-outline-variant pb-unit mb-stack-sm">
+          Vault Integrity
+          <span class="material-symbols-outlined text-[16px]">folder_open</span>
+        </div>
+        <div class="flex flex-col gap-unit">
+          <div class="flex items-end gap-gutter">
+            <span class="font-headline-lg text-headline-lg text-on-surface leading-none">87.4</span>
+            <span class="font-label-sm text-label-sm text-primary pb-1">% SECURE</span>
+          </div>
+          <div class="w-full h-2 bg-surface-container-highest border border-outline-variant flex">
+            <div class="h-full bg-primary w-[87.4%] shadow-[0_0_5px_rgba(112,255,224,0.7)]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local Anomaly Scan -->
+      <div class="border border-outline-variant bg-surface-container-low p-stack-md flex-grow basis-1/2 flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute inset-0 bg-primary/5 backdrop-blur-[2px] pointer-events-none"></div>
+        <div class="font-label-sm text-label-sm text-primary uppercase tracking-widest flex items-center justify-between relative z-10 border-b border-primary/30 pb-unit mb-stack-sm">
+          Local Anomaly Scan
+          <span class="material-symbols-outlined text-[16px]">radar</span>
+        </div>
+        <div class="relative z-10 flex flex-col justify-end h-full gap-stack-sm">
+          <div class="flex items-end justify-between h-16 border-b border-outline-variant px-unit">
+            <div class="w-2 bg-outline-variant h-[30%]"></div>
+            <div class="w-2 bg-outline-variant h-[50%]"></div>
+            <div class="w-2 bg-outline-variant h-[20%]"></div>
+            <div class="w-2 bg-primary h-[80%] glow-sm"></div>
+            <div class="w-2 bg-outline-variant h-[40%]"></div>
+            <div class="w-2 bg-outline-variant h-[10%]"></div>
+            <div class="w-2 bg-outline-variant h-[60%]"></div>
+          </div>
+          <div class="font-label-md text-label-md text-on-surface">Status: <span class="text-primary">NOMINAL</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 2: SCAN                                              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<main id="screen-scan" class="hidden ml-64 mt-16 h-[calc(100vh-64px)] p-container-padding flex gap-stack-lg bg-[linear-gradient(to_right,rgba(132,148,143,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(132,148,143,0.03)_1px,transparent_1px)] bg-[size:24px_24px] relative z-10">
+
+  <!-- Left: Camera viewfinder -->
+  <section class="flex-1 flex flex-col">
+    <div class="flex justify-between items-end mb-stack-sm border-b border-outline-variant pb-unit">
+      <h2 class="font-label-md text-label-md text-primary tracking-widest uppercase">Optical Character Recognition</h2>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">SYS_THREAD_09A</span>
+    </div>
+
+    <div class="relative flex-1 bg-surface-container-highest border border-outline-variant overflow-hidden">
+      <!-- Corner accents -->
+      <div class="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-primary z-10 m-stack-sm"></div>
+      <div class="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-primary z-10 m-stack-sm"></div>
+      <div class="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-primary z-10 m-stack-sm"></div>
+      <div class="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-primary z-10 m-stack-sm"></div>
+
+      <!-- Tint overlay -->
+      <div class="absolute inset-0 bg-primary/5 z-10 pointer-events-none mix-blend-overlay"></div>
+      <!-- Animated horizontal scan line -->
+      <div class="absolute left-0 right-0 h-[2px] bg-primary z-20 shadow-[0_0_15px_rgba(112,255,224,0.8),0_0_30px_rgba(112,255,224,0.4)] scan-line-anim"></div>
+      <!-- Gradient sweep above scan line -->
+      <div class="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-transparent to-primary/10 z-10 pointer-events-none"></div>
+
+      <img
+        alt="Medical Document"
+        class="w-full h-full object-cover"
+        style="filter: grayscale(1) contrast(1.25) brightness(0.75);"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAg0Kea8svB6GnKaP2C6ZESTIuURokdfKpTA-8pvtIlNW643Ds26YsObfwtTVYOhCz3EAr9wxC_m6zx-rbIYKLycempLS4YID2Cbd3xb0LwZmQuIs0gMPBj-ZtW26kQtFGlI2rnpVy967ie3ySDCr4u04etP7OJTP-1GCpGNvUSSXFcAQyGjfOwddCFvCdOfSmoUnupUWrburOOEMzsRA3yWR_s5vkeOvAz8Iz6e55aOkn_l73TdNMM2gto5R0Y67YvpaS9BFCTUA"
+      />
+
+      <!-- HUD bar -->
+      <div class="absolute bottom-0 left-0 right-0 p-stack-sm bg-surface-container-lowest/80 backdrop-blur-sm border-t border-outline-variant z-20 flex justify-between items-center">
+        <div class="flex gap-stack-md">
+          <span class="font-label-sm text-label-sm text-primary flex items-center gap-unit">
+            <span class="material-symbols-outlined text-[14px]">adjust</span> ACQUIRING TARGET
+          </span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant">ISO 3200</span>
+        </div>
+        <span class="font-label-sm text-label-sm text-primary">FRM: 144</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Right: Extracted entities -->
+  <section class="flex-1 flex flex-col max-w-2xl border-l border-outline-variant pl-stack-lg">
+    <div class="flex justify-between items-end mb-stack-sm border-b border-outline-variant pb-unit">
+      <h2 class="font-label-md text-label-md text-on-surface-variant tracking-widest uppercase">Extracted Entities</h2>
+      <span class="font-label-sm text-label-sm text-primary">[ 3 ] DETECTED</span>
+    </div>
+
+    <div class="flex-1 overflow-y-auto pr-unit flex flex-col gap-stack-md pb-stack-lg">
+
+      <!-- Drug 01 -->
+      <article id="drug-01" class="scan-card bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors">
+        <header class="border-b border-outline-variant p-stack-sm flex justify-between items-center bg-surface-container-highest">
+          <h3 class="font-label-md text-label-md text-primary flex items-center gap-stack-sm">
+            <span class="text-on-surface-variant">[ 01 ]</span> LISINOPRIL 10MG
+          </h3>
+          <span class="font-label-sm text-label-sm text-on-secondary-container bg-secondary-container px-unit py-1 border border-outline-variant">CONFIDENCE 99.4%</span>
+        </header>
+        <div class="p-stack-md">
+          <p class="font-body-md text-body-md text-on-surface">
+            Identified as an ACE inhibitor. This synthetic compound primarily functions to relax blood vessels, decreasing blood pressure and reducing the overall workload on the cardiovascular system. Local protocols indicate it is commonly prescribed for hypertension or post-myocardial infarction management.
+          </p>
+        </div>
+      </article>
+
+      <!-- Drug 02 -->
+      <article id="drug-02" class="scan-card bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors">
+        <header class="border-b border-outline-variant p-stack-sm flex justify-between items-center bg-surface-container-highest">
+          <h3 class="font-label-md text-label-md text-primary flex items-center gap-stack-sm">
+            <span class="text-on-surface-variant">[ 02 ]</span> METFORMIN HCL 500MG
+          </h3>
+          <span class="font-label-sm text-label-sm text-on-secondary-container bg-secondary-container px-unit py-1 border border-outline-variant">CONFIDENCE 98.1%</span>
+        </header>
+        <div class="p-stack-md">
+          <p class="font-body-md text-body-md text-on-surface">
+            Classified as a biguanide antihyperglycemic agent. The chemical works by decreasing hepatic glucose production, decreasing intestinal absorption of glucose, and improving insulin sensitivity by increasing peripheral glucose uptake and utilization. It serves as a baseline metabolic regulator.
+          </p>
+          <div class="mt-stack-sm pt-stack-sm border-t border-dashed border-outline-variant flex items-center gap-stack-sm text-tertiary-fixed-dim">
+            <span class="material-symbols-outlined text-[16px]">warning</span>
+            <span class="font-label-sm text-label-sm">Requires renal function monitoring.</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Drug 03 — lower confidence -->
+      <article id="drug-03" class="scan-card bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors">
+        <header class="border-b border-outline-variant p-stack-sm flex justify-between items-center bg-surface-container-highest">
+          <h3 class="font-label-md text-label-md text-on-surface flex items-center gap-stack-sm">
+            <span class="text-on-surface-variant">[ 03 ]</span> ATORVASTATIN 20MG
+          </h3>
+          <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-unit py-1 border border-outline-variant">CONFIDENCE 84.2%</span>
+        </header>
+        <div class="p-stack-md">
+          <p class="font-body-md text-body-md text-on-surface-variant">
+            HMG-CoA reductase inhibitor. Mechanism involves lipid lowering by inhibiting the synthesis of cholesterol in the liver. A secondary review of the document noise suggests this dosage is indicated for prophylactic cardiovascular risk reduction.
+          </p>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Commit button -->
+    <div class="pt-stack-md border-t border-outline-variant mt-auto">
+      <button class="w-full bg-primary text-on-primary font-label-md text-label-md py-stack-sm hover:brightness-110 transition-all shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] flex items-center justify-center gap-stack-sm uppercase tracking-widest">
+        <span class="material-symbols-outlined icon-fill">save</span>
+        Commit to Vault
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 3: ANALYSIS / VAULT                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<main id="screen-vault" class="hidden ml-64 mt-16 h-[calc(100vh-64px)] p-container-padding flex gap-stack-lg relative z-10 overflow-hidden">
+
+  <!-- Grid bg -->
+  <div class="absolute inset-0 bg-[linear-gradient(rgba(59,74,69,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(59,74,69,0.05)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0"></div>
+
+  <!-- Primary column -->
+  <div class="flex-1 flex flex-col z-10 overflow-y-auto">
+
+    <!-- Status bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-outline-variant pb-stack-sm mb-stack-md gap-stack-sm shrink-0">
+      <div class="flex items-center gap-stack-md">
+        <div class="flex items-center gap-unit border border-tertiary-container bg-tertiary-container/10 px-2 py-1 text-tertiary-container font-label-sm text-label-sm uppercase tracking-wider">
+          <span class="material-symbols-outlined text-[14px]">cloud_off</span>
+          <span>0 bytes sent to cloud</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-stack-md">
+        <!-- Language selector -->
+        <div class="flex items-center gap-unit text-on-surface-variant font-label-sm text-label-sm border border-outline-variant px-2 py-1 bg-surface-container-low">
+          <span class="material-symbols-outlined text-[14px]">translate</span>
+          <select class="bg-transparent border-none text-on-surface-variant focus:ring-0 cursor-pointer uppercase tracking-widest p-0 pl-1 outline-none text-label-sm font-label-sm appearance-none">
+            <option value="en">ENG</option>
+            <option value="ta" selected>TAMIL</option>
+          </select>
+          <span class="material-symbols-outlined text-[14px] pointer-events-none -ml-1">arrow_drop_down</span>
+        </div>
+        <!-- Pulse status -->
+        <div class="flex items-center gap-2 px-2 py-1">
+          <div class="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(112,255,224,0.6)] dot-glow"></div>
+          <span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">System Optimal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI response card -->
+    <div class="border-l-4 border-primary bg-surface-container-high/40 relative overflow-hidden scanline p-container-padding mb-stack-lg shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]">
+      <div class="relative z-10 flex flex-col">
+        <div class="flex items-start justify-between mb-stack-md">
+          <div>
+            <h2 class="font-headline-md text-headline-md text-on-surface mb-unit">பகுப்பாய்வு அறிக்கை முடிந்தது</h2>
+            <p class="font-label-sm text-label-sm text-primary uppercase tracking-widest opacity-80">Query Ref: SQ-9924-Alpha</p>
+          </div>
+          <span class="material-symbols-outlined text-primary text-[32px] opacity-50">memory</span>
+        </div>
+
+        <div class="space-y-stack-md">
+          <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+            உங்கள் உள்ளூர் சூழல் பாதுகாப்பாக உள்ளது. நெட்வொர்க் போக்குவரத்தில் எந்த முரண்பாடுகளும் கண்டறியப்படவில்லை. தரவு கசிவுக்கான சாத்தியக்கூறுகள் பூஜ்ஜியமாக மதிப்பிடப்பட்டுள்ளது.
+          </p>
+          <!-- Terminal log block -->
+          <div class="p-stack-sm border border-outline-variant bg-surface-container-lowest font-label-md text-label-md text-secondary-fixed-dim leading-relaxed whitespace-pre-wrap">[SYSTEM LOG]
+&gt; Initializing deep scan protocol...
+&gt; Verifying cryptographic signatures... [OK]
+&gt; Analyzing sub-routine variance... [NOMINAL]
+&gt; Conclusion: No external observer detected.</div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            தொடர்ச்சியான கண்காணிப்பு பின்னணியில் இயங்குகிறது. ஏதேனும் முரண்பாடுகள் ஏற்பட்டால், அமைப்பு தானாகவே நெட்வொர்க் அணுகலை துண்டிக்கும்.
+          </p>
+        </div>
+
+        <!-- Metrics grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-gutter mt-stack-lg pt-stack-md border-t border-outline-variant">
+          <div class="border border-outline-variant p-stack-sm flex flex-col gap-unit bg-surface-container-low hover:border-primary transition-colors">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Threat Level</span>
+            <span class="font-headline-md text-headline-md text-primary">NIL</span>
+          </div>
+          <div class="border border-outline-variant p-stack-sm flex flex-col gap-unit bg-surface-container-low hover:border-primary transition-colors">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Data Integrity</span>
+            <span class="font-headline-md text-headline-md text-primary">100%</span>
+          </div>
+          <div class="border border-outline-variant p-stack-sm flex flex-col gap-unit bg-surface-container-low hover:border-primary transition-colors">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Local Isolation</span>
+            <span class="font-headline-md text-headline-md text-primary">ACTIVE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command input -->
+    <div class="z-10 w-full max-w-3xl mt-auto shrink-0">
+      <label class="font-label-sm text-label-sm text-on-surface-variant mb-unit block uppercase tracking-widest">Command Input</label>
+      <div class="relative flex items-center border-b border-outline-variant focus-within:border-primary transition-colors">
+        <span class="font-label-md text-primary mr-2 select-none cursor-blink">&gt;</span>
+        <input
+          id="vault-command-input"
+          class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-label-md text-label-md placeholder-outline py-stack-sm px-0 outline-none"
+          placeholder="Enter query for local AI..."
+          type="text"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Right aside: Session logs (desktop only) -->
+  <aside class="hidden xl:flex flex-col w-80 border-l border-outline-variant pl-gutter h-full z-10 overflow-hidden">
+    <div class="flex items-center justify-between pb-unit border-b border-outline-variant mb-stack-md shrink-0">
+      <h3 class="font-label-md text-label-md text-on-surface uppercase tracking-widest">Session Logs</h3>
+      <span class="material-symbols-outlined text-[18px] text-on-surface-variant">terminal</span>
+    </div>
+
+    <div class="flex-1 overflow-y-auto pr-unit space-y-unit">
+      <!-- Normal -->
+      <div class="border border-outline-variant p-unit bg-surface-container-low flex flex-col">
+        <div class="flex justify-between items-center opacity-70">
+          <span class="font-label-sm text-label-sm text-on-surface-variant">14:02:44.112</span>
+          <span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+        </div>
+        <span class="font-label-md text-label-md text-on-surface mt-1">Local Model Loaded</span>
+      </div>
+      <!-- Normal -->
+      <div class="border border-outline-variant p-unit bg-surface-container-low flex flex-col">
+        <div class="flex justify-between items-center opacity-70">
+          <span class="font-label-sm text-label-sm text-on-surface-variant">14:02:45.005</span>
+          <span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+        </div>
+        <span class="font-label-md text-label-md text-on-surface mt-1">Context Window Ready</span>
+      </div>
+      <!-- Warning / amber -->
+      <div class="border border-tertiary-container p-unit bg-tertiary-container/5 flex flex-col relative overflow-hidden">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-container"></div>
+        <div class="flex justify-between items-center pl-2 opacity-90">
+          <span class="font-label-sm text-label-sm text-tertiary-container">14:05:12.880</span>
+          <span class="material-symbols-outlined text-[14px] text-tertiary-container">warning</span>
+        </div>
+        <span class="font-label-md text-label-md text-tertiary-container pl-2 mt-1">High CPU Variance</span>
+        <span class="font-label-sm text-label-sm text-tertiary-container/70 pl-2 mt-1">Throttling sub-processes to maintain ambient temperature.</span>
+      </div>
+      <!-- Normal -->
+      <div class="border border-outline-variant p-unit bg-surface-container-low flex flex-col">
+        <div class="flex justify-between items-center opacity-70">
+          <span class="font-label-sm text-label-sm text-on-surface-variant">14:08:22.001</span>
+          <span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+        </div>
+        <span class="font-label-md text-label-md text-on-surface mt-1">Query Executed</span>
+      </div>
+    </div>
+
+    <!-- Decorative hexagon -->
+    <div class="mt-auto pt-stack-md flex justify-center opacity-20 border-t border-outline-variant shrink-0">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L22 7.8V16.2L12 22L2 16.2V7.8L12 2Z" stroke="#70ffe0" stroke-width="1"/>
+        <circle cx="12" cy="12" r="3" fill="#70ffe0"/>
+      </svg>
+    </div>
+  </aside>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- NAVIGATION SCRIPT                                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+  // ══════════════════════════════════════════════════════════════
+  // SCREEN NAVIGATION
+  // ══════════════════════════════════════════════════════════════
+  const screens = ['monitor', 'scan', 'vault'];
+
+  function switchScreen(name) {
+    screens.forEach(s => {
+      document.getElementById('screen-' + s).classList.toggle('hidden', s !== name);
+    });
+    screens.forEach(s => {
+      const btn  = document.getElementById('nav-' + s);
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (s === name) {
+        btn.className = btn.className.replace('nav-inactive', 'nav-active');
+        icon.classList.add('icon-fill');
+      } else {
+        btn.className = btn.className.replace('nav-active', 'nav-inactive');
+        icon.classList.remove('icon-fill');
+      }
+    });
+    if (name === 'scan') revealDrugCards();
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // MONITOR — TERMINAL LOG AUTO-SCROLL
+  // ══════════════════════════════════════════════════════════════
+  const logMessages = [
+    '[AUDIO] Signal detected.',
+    '[LLM] Processing query...',
+    '[SEC] Isolation confirmed.',
+    '[MEM] Cache refreshed.',
+    '[SYS] Standby nominal.',
+  ];
+  let logIndex = 0;
+
+  function padTwo(n) { return String(n).padStart(2, '0'); }
+
+  function tsNow() {
+    const d = new Date();
+    return padTwo(d.getHours()) + ':' + padTwo(d.getMinutes()) + ':' + padTwo(d.getSeconds());
+  }
+
+  function appendLogLine(msg, color) {
+    const log    = document.getElementById('terminal-log');
+    const cursor = document.getElementById('terminal-cursor');
+    if (!log || !cursor) return;
+
+    const text = msg || logMessages[logIndex++ % logMessages.length];
+    const cls  = color === 'amber' ? 'text-tertiary-fixed-dim' : 'text-primary';
+
+    const row = document.createElement('div');
+    row.className = 'flex gap-unit opacity-90';
+    row.innerHTML = `<span class="w-16 shrink-0 ${cls}">${tsNow()}</span><span>${text}</span>`;
+
+    log.insertBefore(row, cursor);
+
+    const rows = log.querySelectorAll('div:not(#terminal-cursor)');
+    if (rows.length > 12) rows[0].remove();
+
+    log.scrollTop = log.scrollHeight;
+  }
+
+  setInterval(appendLogLine, 4000);
+
+  // ══════════════════════════════════════════════════════════════
+  // MONITOR — VOICE RECORDING
+  // ══════════════════════════════════════════════════════════════
+  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition  = null;
+  let isRecording  = false;
+  let capturedText = '';
+  let silenceTimer = null;
+
+  // DOM refs (resolved after page load)
+  const $ = id => document.getElementById(id);
+
+  function initVoice() {
+    if (!SpeechRecognitionAPI) {
+      $('voice-fallback').classList.remove('hidden');
+      $('status-label').textContent = 'Type below';
+      $('status-label').style.color = '#ffb94f';
+      $('status-label').style.borderColor = '#ffb94f';
+      return;
+    }
+
+    recognition = new SpeechRecognitionAPI();
+    recognition.continuous      = true;
+    recognition.interimResults  = true;
+    recognition.lang            = 'en-US';
+
+    recognition.onresult = (e) => {
+      resetSilenceTimer();
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) capturedText += t;
+        else interim += t;
+      }
+      $('transcript-display').textContent = capturedText + interim;
+    };
+
+    recognition.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        showVoiceFallback();
+      }
+      if (isRecording) stopRecording();
+    };
+
+    recognition.onend = () => {
+      // browser ended on its own (e.g. long silence) — treat as stop
+      if (isRecording) stopRecording();
+    };
+  }
+
+  function resetSilenceTimer() {
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(stopRecording, 10000);
+  }
+
+  function setRecordingUI(active) {
+    const label    = $('status-label');
+    const ring     = $('outer-ring');
+    const core     = $('voice-core');
+    const icon     = $('eq-icon');
+
+    if (active) {
+      label.textContent = 'RECORDING...';
+      label.style.color       = '#ffb94f';
+      label.style.borderColor = '#ffb94f';
+      label.style.boxShadow   = 'inset 0 0 10px rgba(255,185,79,0.25)';
+      ring.classList.add('ring-recording');
+      core.classList.add('recording-active');
+      icon.classList.remove('eq-anim');
+      icon.classList.add('eq-anim-fast');
+      icon.style.color = '#ffb94f';
+      $('transcript-area').classList.remove('hidden');
+      $('process-btn').classList.add('hidden');
+    } else {
+      label.textContent = 'Listening';
+      label.style.color       = '';
+      label.style.borderColor = '';
+      label.style.boxShadow   = '';
+      ring.classList.remove('ring-recording');
+      core.classList.remove('recording-active');
+      icon.classList.remove('eq-anim-fast');
+      icon.classList.add('eq-anim');
+      icon.style.color = '';
+    }
+  }
+
+  function startRecording() {
+    capturedText = '';
+    $('transcript-display').textContent = '';
+    setRecordingUI(true);
+    appendLogLine('[AUDIO] Recording started...', 'amber');
+    recognition.start();
+    resetSilenceTimer();
+  }
+
+  function stopRecording() {
+    if (!isRecording) return;
+    isRecording = false;
+    clearTimeout(silenceTimer);
+
+    try { recognition.stop(); } catch (_) {}
+
+    setRecordingUI(false);
+    $('transcript-area').classList.add('hidden');
+
+    const wordCount = capturedText.trim().split(/\s+/).filter(Boolean).length;
+
+    if (capturedText.trim()) {
+      appendLogLine(`[AUDIO] Transcript captured — ${wordCount} word${wordCount !== 1 ? 's' : ''}.`);
+      $('process-btn').classList.remove('hidden');
+    } else {
+      appendLogLine('[AUDIO] No speech detected.');
+    }
+  }
+
+  function toggleRecording() {
+    if (!SpeechRecognitionAPI) return; // fallback handles its own flow
+    if (isRecording) {
+      stopRecording();
+    } else {
+      isRecording = true;
+      startRecording();
+    }
+  }
+
+  function processQuery() {
+    const text = capturedText.trim() || $('fallback-input')?.value.trim() || '';
+    if (!text) return;
+    switchScreen('vault');
+    const input = $('vault-command-input');
+    if (input) {
+      input.value = text;
+      input.focus();
+    }
+    appendLogLine('[LLM] Query dispatched to Analysis.');
+  }
+
+  // Fallback: show process button as user types
+  function onFallbackInput(val) {
+    capturedText = val;
+    $('fallback-process-btn').classList.toggle('hidden', !val.trim());
+  }
+
+  function showVoiceFallback() {
+    $('voice-fallback').classList.remove('hidden');
+    $('status-label').textContent = 'Type below';
+    $('status-label').style.color = '#ffb4ab';
+    $('status-label').style.borderColor = '#ffb4ab';
+  }
+
+  // Boot voice on page load
+  document.addEventListener('DOMContentLoaded', initVoice);
+
+  // ══════════════════════════════════════════════════════════════
+  // SCAN — STAGGERED DRUG CARD REVEAL (ONE-TIME)
+  // ══════════════════════════════════════════════════════════════
+  let scanRevealed = false;
+
+  function revealDrugCards() {
+    if (scanRevealed) return;
+    scanRevealed = true;
+    [
+      { id: 'drug-01', cls: 'card-reveal',     delay: 0    },
+      { id: 'drug-02', cls: 'card-reveal',     delay: 600  },
+      { id: 'drug-03', cls: 'card-reveal-dim', delay: 1200 },
+    ].forEach(({ id, cls, delay }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      setTimeout(() => {
+        el.classList.remove('scan-card');
+        el.classList.add(cls);
+      }, delay);
+    });
+  }
+</script>
+
+</body>
+</html>

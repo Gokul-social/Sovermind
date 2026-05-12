@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SoverMind - Document Scan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&amp;family=Source+Serif+4:wght@400;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for brutalist feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1511; 
+            border-left: 1px solid #3b4a45;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b4a45; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #70ffe0; 
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#291800",
+                        "on-primary": "#00382e",
+                        "on-secondary-container": "#a3bfac",
+                        "on-surface": "#dfe4de",
+                        "surface-tint": "#00dfbe",
+                        "surface-container-highest": "#313632",
+                        "surface-container-low": "#181d19",
+                        "surface-container-high": "#262b28",
+                        "primary-container": "#00e5c3",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary": "#452b00",
+                        "tertiary": "#ffe3c2",
+                        "inverse-primary": "#006b5a",
+                        "on-primary-container": "#006152",
+                        "tertiary-fixed-dim": "#ffb94f",
+                        "secondary-fixed-dim": "#b1cdba",
+                        "on-secondary-fixed": "#062014",
+                        "on-primary-fixed-variant": "#005143",
+                        "inverse-surface": "#dfe4de",
+                        "on-background": "#dfe4de",
+                        "on-surface-variant": "#b9cac4",
+                        "secondary": "#b1cdba",
+                        "primary": "#70ffe0",
+                        "surface-variant": "#313632",
+                        "on-primary-fixed": "#00201a",
+                        "tertiary-container": "#ffc064",
+                        "on-tertiary-fixed-variant": "#624000",
+                        "surface-dim": "#0f1511",
+                        "outline-variant": "#3b4a45",
+                        "secondary-fixed": "#ccead5",
+                        "on-tertiary-container": "#764d00",
+                        "inverse-on-surface": "#2c322e",
+                        "on-secondary-fixed-variant": "#334c3d",
+                        "error-container": "#93000a",
+                        "on-secondary": "#1d3528",
+                        "surface-bright": "#353a37",
+                        "on-error": "#690005",
+                        "background": "#0f1511",
+                        "secondary-container": "#354f40",
+                        "tertiary-fixed": "#ffddb3",
+                        "surface": "#0f1511",
+                        "primary-fixed-dim": "#00dfbe",
+                        "surface-container": "#1c211d",
+                        "surface-container-lowest": "#0a0f0c",
+                        "primary-fixed": "#42fdda",
+                        "outline": "#84948f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "gutter": "12px",
+                        "container-padding": "20px",
+                        "stack-md": "16px",
+                        "unit": "4px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Syne", "sans-serif"],
+                        "body-md": ["Source Serif 4", "serif"],
+                        "body-lg": ["Source Serif 4", "serif"],
+                        "label-md": ["IBM Plex Mono", "monospace"],
+                        "headline-md": ["Syne", "sans-serif"],
+                        "label-sm": ["IBM Plex Mono", "monospace"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-hidden selection:bg-primary selection:text-on-primary">
+<nav class="fixed left-0 top-0 h-full flex flex-col z-40 w-64 border-r border-outline-variant bg-surface-container-low">
+<div class="p-container-padding border-b border-outline-variant">
+<h1 class="font-headline-md text-headline-md font-extrabold tracking-tighter text-primary dark:text-primary mb-unit">SOVERMIND</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Local System Active</p>
+</div>
+<div class="flex-1 flex flex-col py-stack-md gap-unit">
+<a class="flex items-center gap-stack-md p-stack-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">mic</span>
+<span class="font-label-md text-label-md">Monitor</span>
+</a>
+<a class="flex items-center gap-stack-md p-stack-md bg-secondary-container text-primary border-r-2 border-primary shadow-[inset_0_0_10px_rgba(112,255,224,0.15)] scale-[0.98] font-bold" href="#">
+<span class="material-symbols-outlined icon-fill">document_scanner</span>
+<span class="font-label-md text-label-md">Scan</span>
+</a>
+<a class="flex items-center gap-stack-md p-stack-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-md text-label-md">Vault</span>
+</a>
+</div>
+<div class="p-container-padding border-t border-outline-variant">
+<button class="w-full border border-error text-error font-label-md text-label-md py-stack-sm hover:bg-error hover:text-on-error transition-colors uppercase tracking-widest">
+                Emergency Purge
+            </button>
+</div>
+</nav>
+<header class="fixed top-0 right-0 left-64 flex justify-between items-center px-container-padding z-50 h-16 border-b border-outline-variant bg-surface-container-lowest">
+<div class="font-headline-lg text-headline-lg font-black tracking-widest text-primary dark:text-primary opacity-50">
+            SOVERMIND
+        </div>
+<div class="flex items-center gap-stack-md">
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200">
+<span class="material-symbols-outlined">wifi_off</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200">
+<span class="material-symbols-outlined">enhanced_encryption</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="ml-64 mt-16 h-[calc(100vh-4rem)] p-container-padding flex gap-stack-lg bg-surface bg-[linear-gradient(to_right,#84948f08_1px,transparent_1px),linear-gradient(to_bottom,#84948f08_1px,transparent_1px)] bg-[size:24px_24px]">
+<section class="flex-1 flex flex-col">
+<div class="flex justify-between items-end mb-stack-sm border-b border-outline-variant pb-unit">
+<h2 class="font-label-md text-label-md text-primary tracking-widest uppercase">Optical Character Recognition</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SYS_THREAD_09A</span>
+</div>
+<div class="relative flex-1 bg-surface-container-highest border border-outline-variant overflow-hidden group">
+<div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primary z-10 m-stack-sm"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-primary z-10 m-stack-sm"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-primary z-10 m-stack-sm"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary z-10 m-stack-sm"></div>
+<div class="absolute inset-0 bg-primary/5 z-10 pointer-events-none mix-blend-overlay"></div>
+<div class="absolute top-[45%] left-0 right-0 h-[2px] bg-primary z-20 shadow-[0_0_15px_rgba(112,255,224,0.8)]"></div>
+<div class="absolute top-0 left-0 right-0 bottom-[55%] bg-gradient-to-b from-transparent to-primary/20 z-10"></div>
+<img alt="Medical Document" class="w-full h-full object-cover filter grayscale contrast-125 brightness-75" data-alt="A macro, clinical view of a crumpled medical prescription resting on a sterile, dark metallic surface. The paper is illuminated by harsh, angular white light that casts deep shadows, emphasizing the texture of the document and the stark black ink. Overlaying the scene is a faint, bioluminescent teal digital grid, suggesting an advanced technological interface scanning biological data. The mood is cold, precise, and heavily brutalist, stripped of any warmth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAg0Kea8svB6GnKaP2C6ZESTIuURokdfKpTA-8pvtIlNW643Ds26YsObfwtTVYOhCz3EAr9wxC_m6zx-rbIYKLycempLS4YID2Cbd3xb0LwZmQuIs0gMPBj-ZtW26kQtFGlI2rnpVy967ie3ySDCr4u04etP7OJTP-1GCpGNvUSSXFcAQyGjfOwddCFvCdOfSmoUnupUWrburOOEMzsRA3yWR_s5vkeOvAz8Iz6e55aOkn_l73TdNMM2gto5R0Y67YvpaS9BFCTUA"/>
+<div class="absolute bottom-0 left-0 right-0 p-stack-sm bg-surface-container-lowest/80 backdrop-blur-sm border-t border-outline-variant z-20 flex justify-between items-center">
+<div class="flex gap-stack-md">
+<span class="font-label-sm text-label-sm text-primary flex items-center gap-unit">
+<span class="material-symbols-outlined text-[14px]">adjust</span> ACQUIRING TARGET
+                        </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">ISO 3200</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary">FRM: 144</span>
+</div>
+</div>
+</section>
+<section class="flex-1 flex flex-col w-full max-w-2xl border-l border-outline-variant pl-stack-lg">
+<div class="flex justify-between items-end mb-stack-sm border-b border-outline-variant pb-unit">
+<h2 class="font-label-md text-label-md text-on-surface-variant tracking-widest uppercase">Extracted Entities</h2>
+<span class="font-label-sm text-label-sm text-primary">[ 3 ] DETECTED</span>
+</div>
+<div class="flex-1 overflow-y-auto pr-unit flex flex-col gap-stack-md pb-stack-lg">
+<article class="bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors">
+<header class="border-b border-outline-variant p-stack-sm flex justify-between items-center bg-surface-container-highest">
+<h3 class="font-label-md text-label-md text-primary flex items-center gap-stack-sm">
+<span class="text-on-surface-variant">[ 01 ]</span> LISINOPRIL 10MG
+                        </h3>
+<span class="font-label-sm text-label-sm text-on-secondary-container bg-secondary-container px-unit py-1 rounded-sm border border-outline-variant">CONFIDENCE 99.4%</span>
+</header>
+<div class="p-stack-md">
+<p class="font-body-md text-body-md text-on-surface">
+                            Identified as an ACE inhibitor. This synthetic compound primarily functions to relax blood vessels, decreasing blood pressure and reducing the overall workload on the cardiovascular system. Local protocols indicate it is commonly prescribed for hypertension or post-myocardial infarction management.
+                        </p>
+</div>
+</article>
+<article class="bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors">
+<header class="border-b border-outline-variant p-stack-sm flex justify-between items-center bg-surface-container-highest">
+<h3 class="font-label-md text-label-md text-primary flex items-center gap-stack-sm">
+<span class="text-on-surface-variant">[ 02 ]</span> METFORMIN HCL 500MG
+                        </h3>
+<span class="font-label-sm text-label-sm text-on-secondary-container bg-secondary-container px-unit py-1 rounded-sm border border-outline-variant">CONFIDENCE 98.1%</span>
+</header>
+<div class="p-stack-md">
+<p class="font-body-md text-body-md text-on-surface">
+                            Classified as a biguanide antihyperglycemic agent. The chemical works by decreasing hepatic glucose production, decreasing intestinal absorption of glucose, and improving insulin sensitivity by increasing peripheral glucose uptake and utilization. It serves as a baseline metabolic regulator.
+                        </p>
+<div class="mt-stack-sm pt-stack-sm border-t border-outline-variant border-dashed flex items-center gap-stack-sm text-tertiary-fixed-dim">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+<span class="font-label-sm text-label-sm">Requires renal function monitoring.</span>
+</div>
+</div>
+</article>
+<article class="bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors opacity-75">
+<header class="border-b border-outline-variant p-stack-sm flex justify-between items-center bg-surface-container-highest">
+<h3 class="font-label-md text-label-md text-on-surface flex items-center gap-stack-sm">
+<span class="text-on-surface-variant">[ 03 ]</span> ATORVASTATIN 20MG
+                        </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-unit py-1 rounded-sm border border-outline-variant">CONFIDENCE 84.2%</span>
+</header>
+<div class="p-stack-md">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                            HMG-CoA reductase inhibitor. Mechanism involves lipid lowering by inhibiting the synthesis of cholesterol in the liver. A secondary review of the document noise suggests this dosage is indicated for prophylactic cardiovascular risk reduction.
+                        </p>
+</div>
+</article>
+</div>
+<div class="pt-stack-md border-t border-outline-variant mt-auto">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-stack-sm hover:brightness-110 transition-all shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] flex items-center justify-center gap-stack-sm">
+<span class="material-symbols-outlined icon-fill">save</span>
+                    COMMIT TO VAULT
+                </button>
+</div>
+</section>
+</main>
+</body></html>

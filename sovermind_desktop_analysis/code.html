@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SoverMind - Analysis Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&amp;family=Source+Serif+4:wght@400&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#291800",
+                        "on-primary": "#00382e",
+                        "on-secondary-container": "#a3bfac",
+                        "on-surface": "#dfe4de",
+                        "surface-tint": "#00dfbe",
+                        "surface-container-highest": "#313632",
+                        "surface-container-low": "#181d19",
+                        "surface-container-high": "#262b28",
+                        "primary-container": "#00e5c3",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary": "#452b00",
+                        "tertiary": "#ffe3c2",
+                        "inverse-primary": "#006b5a",
+                        "on-primary-container": "#006152",
+                        "tertiary-fixed-dim": "#ffb94f",
+                        "secondary-fixed-dim": "#b1cdba",
+                        "on-secondary-fixed": "#062014",
+                        "on-primary-fixed-variant": "#005143",
+                        "inverse-surface": "#dfe4de",
+                        "on-background": "#dfe4de",
+                        "on-surface-variant": "#b9cac4",
+                        "secondary": "#b1cdba",
+                        "primary": "#70ffe0",
+                        "surface-variant": "#313632",
+                        "on-primary-fixed": "#00201a",
+                        "tertiary-container": "#ffc064",
+                        "on-tertiary-fixed-variant": "#624000",
+                        "surface-dim": "#0f1511",
+                        "outline-variant": "#3b4a45",
+                        "secondary-fixed": "#ccead5",
+                        "on-tertiary-container": "#764d00",
+                        "inverse-on-surface": "#2c322e",
+                        "on-secondary-fixed-variant": "#334c3d",
+                        "error-container": "#93000a",
+                        "on-secondary": "#1d3528",
+                        "surface-bright": "#353a37",
+                        "on-error": "#690005",
+                        "background": "#0f1511",
+                        "secondary-container": "#354f40",
+                        "tertiary-fixed": "#ffddb3",
+                        "surface": "#0f1511",
+                        "primary-fixed-dim": "#00dfbe",
+                        "surface-container": "#1c211d",
+                        "surface-container-lowest": "#0a0f0c",
+                        "primary-fixed": "#42fdda",
+                        "outline": "#84948f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "gutter": "12px",
+                        "container-padding": "20px",
+                        "stack-md": "16px",
+                        "unit": "4px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Syne"],
+                        "body-md": ["Source Serif 4"],
+                        "body-lg": ["Source Serif 4"],
+                        "label-md": ["IBM Plex Mono"],
+                        "headline-md": ["Syne"],
+                        "label-sm": ["IBM Plex Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Base typography application for html/body to ensure Source Serif 4 defaults correctly if not overridden */
+        body {
+            font-family: 'Source Serif 4', serif;
+        }
+        .glow-sm {
+            box-shadow: inset 0 0 10px rgba(112, 255, 224, 0.2);
+        }
+        /* Custom scrollbar for terminal aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: theme('colors.surface-container-lowest');
+            border-left: 1px solid theme('colors.outline-variant');
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.outline-variant');
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.primary');
+        }
+    </style>
+</head>
+<body class="bg-background dark:bg-background text-on-background min-h-screen flex selection:bg-primary/30 selection:text-primary">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-64 flex flex-col z-40 bg-surface-container-low border-r border-outline-variant hidden md:flex">
+<div class="p-container-padding border-b border-outline-variant shrink-0">
+<h1 class="font-headline-md text-headline-md font-extrabold tracking-tighter text-primary dark:text-primary uppercase">SOVERMIND</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-unit uppercase tracking-widest">Local System Active</p>
+</div>
+<div class="flex-1 overflow-y-auto py-stack-md flex flex-col gap-unit px-stack-sm">
+<!-- Active Tab -->
+<a class="flex items-center gap-stack-md p-stack-md bg-secondary-container text-primary border-r-2 border-primary glow-sm transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span>
+<span class="font-label-md text-label-md uppercase tracking-wide">Monitor</span>
+</a>
+<!-- Inactive Tabs -->
+<a class="flex items-center gap-stack-md p-stack-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">document_scanner</span>
+<span class="font-label-md text-label-md uppercase tracking-wide">Scan</span>
+</a>
+<a class="flex items-center gap-stack-md p-stack-md text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-md text-label-md uppercase tracking-wide">Vault</span>
+</a>
+</div>
+<div class="p-container-padding mt-auto border-t border-outline-variant shrink-0">
+<button class="w-full flex items-center justify-center gap-unit p-stack-sm border border-error text-error hover:bg-error-container hover:text-on-error-container transition-colors font-label-md text-label-md uppercase tracking-widest bg-transparent">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+                Emergency Purge
+            </button>
+</div>
+</nav>
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-0 md:left-64 flex justify-between items-center px-container-padding z-50 h-16 border-b border-outline-variant bg-surface-container-lowest">
+<div class="md:hidden font-headline-md text-headline-md font-extrabold tracking-tighter text-primary">SOVERMIND</div>
+<div class="hidden md:block font-headline-lg text-headline-lg font-black tracking-widest text-transparent">SOVERMIND</div> <!-- Hidden to keep focus on sidebar brand, but maintains structure -->
+<div class="flex items-center gap-stack-md">
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200 focus:outline-none focus:text-primary">
+<span class="material-symbols-outlined">wifi_off</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200 focus:outline-none focus:text-primary">
+<span class="material-symbols-outlined">enhanced_encryption</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200 focus:outline-none focus:text-primary">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-0 md:ml-64 pt-16 min-h-screen p-container-padding flex flex-col xl:flex-row gap-stack-lg relative overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-surface-container-high/20 via-background to-background">
+<!-- Grid Background Pattern -->
+<div class="absolute inset-0 bg-[linear-gradient(rgba(59,74,69,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(59,74,69,0.05)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0"></div>
+<!-- Primary Left Column: Analysis Response -->
+<div class="flex-1 flex flex-col max-w-5xl z-10 w-full">
+<!-- Status & Controls Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-outline-variant pb-stack-sm mb-stack-md gap-stack-sm">
+<!-- Security Badges -->
+<div class="flex items-center gap-stack-md">
+<div class="flex items-center gap-unit border border-tertiary-container bg-tertiary-container/10 px-2 py-1 text-tertiary-container font-label-sm text-label-sm uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]">cloud_off</span>
+<span>0 bytes sent to cloud</span>
+</div>
+</div>
+<!-- Locales & Status -->
+<div class="flex items-center gap-stack-md">
+<!-- Language Selector -->
+<div class="flex items-center gap-unit text-on-surface-variant font-label-sm text-label-sm border border-outline-variant px-2 py-1 bg-surface-container-low">
+<span class="material-symbols-outlined text-[14px]">translate</span>
+<select class="bg-transparent border-none text-on-surface-variant focus:ring-0 cursor-pointer uppercase tracking-widest p-0 pl-1 outline-none text-label-sm font-label-sm appearance-none">
+<option value="en">ENG</option>
+<option selected="" value="ta">TAMIL</option>
+</select>
+<span class="material-symbols-outlined text-[14px] pointer-events-none -ml-1">arrow_drop_down</span>
+</div>
+<!-- Pulse Status -->
+<div class="flex items-center gap-2 px-2 py-1">
+<div class="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(112,255,224,0.6)]"></div>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">System Optimal</span>
+</div>
+</div>
+</div>
+<!-- Large AI Response Card (Biopunk Style) -->
+<div class="border-l-[4px] border-primary bg-surface-container-high/40 relative overflow-hidden group p-container-padding flex-1 mb-stack-lg shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]">
+<!-- Scanline Overlay Overlay -->
+<div class="absolute inset-0 bg-[linear-gradient(rgba(112,255,224,0.03)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none"></div>
+<!-- Content Area -->
+<div class="relative z-10 flex flex-col h-full">
+<div class="flex items-start justify-between mb-stack-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-unit">பகுப்பாய்வு அறிக்கை முடிந்தது</h2>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-widest opacity-80">Query Ref: SQ-9924-Alpha</p>
+</div>
+<span class="material-symbols-outlined text-primary text-[32px] opacity-50">memory</span>
+</div>
+<div class="space-y-stack-md flex-1">
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                            உங்கள் உள்ளூர் சூழல் பாதுகாப்பாக உள்ளது. நெட்வொர்க் போக்குவரத்தில் எந்த முரண்பாடுகளும் கண்டறியப்படவில்லை. தரவு கசிவுக்கான சாத்தியக்கூறுகள் பூஜ்ஜியமாக மதிப்பிடப்பட்டுள்ளது.
+                        </p>
+<div class="p-stack-sm border border-outline-variant bg-surface-container-lowest font-label-md text-label-md text-secondary-fixed-dim leading-relaxed whitespace-pre-wrap">
+[SYSTEM LOG]
+&gt; Initializing deep scan protocol...
+&gt; Verifying cryptographic signatures... [OK]
+&gt; Analyzing sub-routine variance... [NOMINAL]
+&gt; Conclusion: No external observer detected.
+                        </div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                            தொடர்ச்சியான கண்காணிப்பு பின்னணியில் இயங்குகிறது. ஏதேனும் முரண்பாடுகள் ஏற்பட்டால், அமைப்பு தானாகவே நெட்வொர்க் அணுகலை துண்டிக்கும்.
+                        </p>
+</div>
+<!-- Metrics Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-gutter mt-stack-lg pt-stack-md border-t border-outline-variant">
+<div class="border border-outline-variant p-stack-sm flex flex-col gap-unit bg-surface-container-low hover:border-primary transition-colors">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Threat Level</span>
+<span class="font-headline-md text-headline-md text-primary">NIL</span>
+</div>
+<div class="border border-outline-variant p-stack-sm flex flex-col gap-unit bg-surface-container-low hover:border-primary transition-colors">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Data Integrity</span>
+<span class="font-headline-md text-headline-md text-primary">100%</span>
+</div>
+<div class="border border-outline-variant p-stack-sm flex flex-col gap-unit bg-surface-container-low hover:border-primary transition-colors">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Local Isolation</span>
+<span class="font-headline-md text-headline-md text-primary">ACTIVE</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Terminal Input Line -->
+<div class="mt-auto z-10 w-full max-w-3xl">
+<label class="font-label-sm text-label-sm text-on-surface-variant mb-unit block uppercase tracking-widest">Command Input</label>
+<div class="relative flex items-center border-b border-outline-variant focus-within:border-primary transition-colors group">
+<span class="font-label-md text-primary mr-2 select-none animate-pulse">&gt;</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-label-md text-label-md placeholder-outline py-stack-sm px-0 outline-none" placeholder="Enter query for local AI..." type="text"/>
+</div>
+</div>
+</div>
+<!-- Secondary Right Column: Biometric/Session Logs (Desktop Only) -->
+<aside class="hidden xl:flex flex-col w-80 border-l border-outline-variant pl-gutter h-[calc(100vh-80px)] z-10 sticky top-20">
+<div class="flex items-center justify-between pb-unit border-b border-outline-variant mb-stack-md">
+<h3 class="font-label-md text-label-md text-on-surface uppercase tracking-widest">Session Logs</h3>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">terminal</span>
+</div>
+<div class="flex-1 overflow-y-auto pr-unit space-y-unit">
+<!-- Log Entry Normal -->
+<div class="border border-outline-variant p-unit bg-surface-container-low flex flex-col">
+<div class="flex justify-between items-center opacity-70">
+<span class="font-label-sm text-label-sm text-on-surface-variant">14:02:44.112</span>
+<span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface mt-1">Local Model Loaded</span>
+</div>
+<!-- Log Entry Normal -->
+<div class="border border-outline-variant p-unit bg-surface-container-low flex flex-col">
+<div class="flex justify-between items-center opacity-70">
+<span class="font-label-sm text-label-sm text-on-surface-variant">14:02:45.005</span>
+<span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface mt-1">Context Window Ready</span>
+</div>
+<!-- Log Entry Warning/Amber -->
+<div class="border border-tertiary-container p-unit bg-tertiary-container/5 flex flex-col relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-container"></div>
+<div class="flex justify-between items-center pl-2 opacity-90">
+<span class="font-label-sm text-label-sm text-tertiary-container">14:05:12.880</span>
+<span class="material-symbols-outlined text-[14px] text-tertiary-container">warning</span>
+</div>
+<span class="font-label-md text-label-md text-tertiary-container pl-2 mt-1">High CPU Variance</span>
+<span class="font-label-sm text-label-sm text-tertiary-container/70 pl-2 mt-1">Throttling sub-processes to maintain ambient temperature.</span>
+</div>
+<!-- Log Entry Normal -->
+<div class="border border-outline-variant p-unit bg-surface-container-low flex flex-col">
+<div class="flex justify-between items-center opacity-70">
+<span class="font-label-sm text-label-sm text-on-surface-variant">14:08:22.001</span>
+<span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface mt-1">Query Executed</span>
+</div>
+</div>
+<!-- Visual Decorative Element at bottom of logs -->
+<div class="mt-auto pt-stack-md flex justify-center opacity-20 border-t border-outline-variant">
+<svg fill="none" height="48" viewbox="0 0 24 24" width="48" xmlns="http://www.w3.org/2000/svg">
+<path class="text-primary" d="M12 2L22 7.8V16.2L12 22L2 16.2V7.8L12 2Z" stroke="currentColor" stroke-width="1"></path>
+<circle class="text-primary" cx="12" cy="12" fill="currentColor" r="3"></circle>
+</svg>
+</div>
+</aside>
+</main>
+</body></html>
