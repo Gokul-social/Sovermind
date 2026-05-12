@@ -6,8 +6,8 @@
   </p>
   
   <p>
-    <a href="https://sovermind.vercel.app"><img src="https://img.shields.io/badge/LIVE_APP-sovermind.vercel.app-70ffe0?style=for-the-badge" alt="Live App" /></a>
-    <a href="https://explorer.solana.com/address/YOUR_PROGRAM_ID?cluster=devnet"><img src="https://img.shields.io/badge/SOLANA-DEVNET-9945FF?style=for-the-badge" alt="Solana Devnet" /></a>
+    <a href="https://sovermind-app.vercel.app/"><img src="https://img.shields.io/badge/LIVE_APP-sovermind--app.vercel.app-70ffe0?style=for-the-badge" alt="Live App" /></a>
+    <a href="https://explorer.solana.com/address/Gyk1UsWrmo2W3p4LGTyyFbsXCWwsocKVc8X3tdDaJXJ4?cluster=devnet"><img src="https://img.shields.io/badge/SOLANA-DEVNET-9945FF?style=for-the-badge" alt="Solana Devnet" /></a>
     <a href="https://qvac.tether.io"><img src="https://img.shields.io/badge/QVAC-SDK_INTEGRATED-00dfbe?style=for-the-badge" alt="QVAC SDK" /></a>
   </p>
 
@@ -44,8 +44,8 @@
 
 | Component | URL | Status |
 |:---|:---|:---:|
-| **Frontend App** | [sovermind.vercel.app](https://sovermind.vercel.app) | Live Demo |
-| **Solana Program** | [`YOUR_PROGRAM_ID`](https://explorer.solana.com/address/YOUR_PROGRAM_ID?cluster=devnet) | Deployed |
+| **Frontend App** | [sovermind-app.vercel.app](https://sovermind-app.vercel.app/) | Live Demo |
+| **Solana Program** | [`Gyk1UsWrmo2W3p4LGTyyFbsXCWwsocKVc8X3tdDaJXJ4`](https://explorer.solana.com/address/Gyk1UsWrmo2W3p4LGTyyFbsXCWwsocKVc8X3tdDaJXJ4?cluster=devnet) | Deployed |
 | **Network** | Solana Devnet | Active |
 
 ---
@@ -179,7 +179,7 @@ graph LR
 
 ### 1. Clone & Download Models
 ```bash
-git clone https://github.com/YOUR_USERNAME/sovermind
+git clone https://github.com/Gokul-social/Sovermind.git
 cd sovermind
 ```
 Download models to `backend/models/`:
@@ -258,7 +258,7 @@ sovermind/
   <br />
   <p>Built for the <strong>Colosseum Frontier Hackathon</strong> · Powered by <strong>Tether QVAC</strong></p>
   <p>
-    <a href="https://sovermind.vercel.app">Live Demo</a> · 
+    <a href="https://sovermind-app.vercel.app/">Live Demo</a> · 
     <a href="https://qvac.tether.io">Tether QVAC Docs</a> · 
     <a href="./LICENSE">MIT License</a>
   </p>
